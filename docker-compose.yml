@@ -1,0 +1,59 @@
+services:
+    # image project
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www
+    environment:
+      XDEBUG_MODE: off
+      PCOV_ENABLED: 0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - teste_legivel_com_pest
+
+    # nginx
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "8989:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/:/etc/nginx/conf.d/
+    networks:
+      - teste_legivel_com_pest
+
+# db postgres
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "5432:5432"
+    networks:
+      - teste_legivel_com_pest
+
+    # redis
+  redis:
+    image: redis:latest
+    networks:
+      - teste_legivel_com_pest
+
+volumes: 
+  postgres_data: 
+    driver: local
+
+networks:
+  teste_legivel_com_pest:
+    driver: bridge
