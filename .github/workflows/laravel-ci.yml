@@ -22,16 +22,16 @@ jobs:
           extensions: dom, curl, mbstring, zip, sqlite
 
       - name: Install Composer dependencies
-        working-directory: ./backend  
+        working-directory: .  
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Prepare environment
-        working-directory: ./backend  
+        working-directory: .  
         run: |
           cp .env.example .env
           php artisan key:generate
           php artisan migrate --env=testing  
 
       - name: Run Pest tests
-        working-directory: ./backend
+        working-directory: .
         run: vendor/bin/pest
