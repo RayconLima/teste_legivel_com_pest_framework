@@ -105,11 +105,30 @@ describe('DELETE /api/bugs/{id}', function () {
         $bug = Bug::factory()->create();
         
         $response = $this->deleteJson("/api/bugs/{$bug->id}");
+        
         $response->assertStatus(204);
+        $this->assertDatabaseMissing('bugs', ['id' => $bug->id]);
     });
 
     test('Não deveria ser possível deletar um bug inexistente', function () {
-        $response = $this->deleteJson('/api/bugs/999');
-        $response->assertStatus(404);
+        // $response = $this->deleteJson('/api/bugs/999');
+        // $response->assertStatus(404);
+        $this->assertDatabaseCount('bugs', 0);
+
+        $this->deleteJson('/api/bugs/9999')
+            ->assertStatus(404)
+            ->assertJsonFragment([
+                'message' => 'Bug não encontrado.',
+            ]);
+    });
+
+    test('Deveria retornar uma mensagem caso o bug não seja encontrado para deleção', function () {
+        $response = $this->deleteJson('/api/bugs/9999');
+        
+        $response
+            ->assertStatus(404)
+            ->assertJsonFragment([
+                'message' => 'Bug não encontrado.',
+            ]);
     });
 });

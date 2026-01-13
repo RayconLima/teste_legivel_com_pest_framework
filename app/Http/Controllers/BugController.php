@@ -6,6 +6,7 @@ use App\Models\Bug;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreBugRequest;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
 
 class BugController extends Controller
 {
@@ -32,15 +33,15 @@ class BugController extends Controller
         ], 200);
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
-        $bug = Bug::findOrFail($id);
+        $bug = Bug::find($id);
 
         if (!$bug) {
-            return response()->json(['message' => 'Bug not found'], 404);
+            return response()->json(['message' => 'Bug não encontrado.'], 404);
         }
         
         $bug->delete();
-        return response()->noContent();
+        return response()->json(['message' => 'Bug deletado com sucesso.'], 204);
     }
 }
