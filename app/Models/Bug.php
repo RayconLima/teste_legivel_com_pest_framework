@@ -18,8 +18,13 @@ class Bug extends Model
         'prioridade',
     ];
 
-    protected $casts = [
-        'status' => StatusEnum::class,
-        'prioridade' => PrioridadeEnum::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'status' => StatusEnum::class,
+            'prioridade' => PrioridadeEnum::class,
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 }
