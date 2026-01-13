@@ -30,15 +30,15 @@ describe('PrioridadeEnum', function () {
         ];
 
         foreach ($prioridadesValidas as $prioridade) {
-            expect(in_array($prioridade, array_map(fn($case) => $case->value(), \App\Enums\PrioridadeEnum::cases())))->toBeTrue();
+            expect(in_array($prioridade, array_map(fn ($case) => $case->value(), \App\Enums\PrioridadeEnum::cases())))->toBeTrue();
         }
 
         $invalidPrioridade = 'invalida';
-        expect(in_array($invalidPrioridade, array_map(fn($case) => $case->value(), \App\Enums\PrioridadeEnum::cases())))->toBeFalse();
+        expect(in_array($invalidPrioridade, array_map(fn ($case) => $case->value(), \App\Enums\PrioridadeEnum::cases())))->toBeFalse();
     });
 
     test('verifica a listagem de todas as prioridades', function () {
-        $prioridades = array_map(fn($case) => $case->value(), \App\Enums\PrioridadeEnum::cases());
+        $prioridades = array_map(fn ($case) => $case->value(), \App\Enums\PrioridadeEnum::cases());
 
         expect($prioridades)->toEqual(['baixa', 'media', 'alta', 'critica']);
     });

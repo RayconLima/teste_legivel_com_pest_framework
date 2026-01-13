@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class BugSeeder extends Seeder
@@ -12,8 +11,7 @@ class BugSeeder extends Seeder
      */
     public function run(): void
     {
-        
-        
+
         \App\Models\Bug::factory()->count(5)->create();
         // $bugs = [
         //     [

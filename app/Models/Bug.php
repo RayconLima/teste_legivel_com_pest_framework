@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use App\Enums\{StatusEnum, PrioridadeEnum};
-use Illuminate\Database\Eloquent\Model;
+use App\Enums\PrioridadeEnum;
+use App\Enums\StatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Bug extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'titulo',
         'descricao',

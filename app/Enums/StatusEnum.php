@@ -12,7 +12,7 @@ enum StatusEnum: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ABERTO => 'Aberto',
             self::EM_PROGRESSO => 'Em Progresso',
             self::RESOLVIDO => 'Resolvido',
@@ -22,7 +22,7 @@ enum StatusEnum: string
 
     public function value(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ABERTO => 'aberto',
             self::EM_PROGRESSO => 'em progresso',
             self::RESOLVIDO => 'resolvido',

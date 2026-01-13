@@ -11,7 +11,7 @@ enum PrioridadeEnum: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BAIXA => 'Baixa',
             self::MEDIA => 'Média',
             self::ALTA => 'Alta',
@@ -21,7 +21,7 @@ enum PrioridadeEnum: string
 
     public function value(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BAIXA => 'baixa',
             self::MEDIA => 'media',
             self::ALTA => 'alta',

@@ -1,14 +1,14 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Bug;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 describe('GET /api/bugs', function () {
     test('Deveria retornar uma lista vazia quando não há bugs', function () {
         $response = $this->getJson('/api/bugs');
-        
+
         $response
             ->assertStatus(200)
             ->assertJson([]);
@@ -16,9 +16,9 @@ describe('GET /api/bugs', function () {
 
     test('Deveria retornar uma lista de bugs quando houver registros', function () {
         Bug::factory()->count(3)->create();
-        
+
         $response = $this->getJson('/api/bugs');
-        
+
         $response
             ->assertStatus(200)
             ->assertJsonStructure([
@@ -46,7 +46,7 @@ describe('POST /api/bugs', function () {
             'prioridade' => 'baixa',
             'descricao' => 'O sistema retorna erro 500 ao submeter',
         ]);
-        
+
         $response
             ->assertStatus(201)
             ->assertJsonStructure([
@@ -65,7 +65,7 @@ describe('POST /api/bugs', function () {
             'titulo' => '',
             'descricao' => 'O sistema retorna erro 500 ao submeter',
         ];
-        
+
         $requisicao = $this->postJson('/api/bugs', $entrada);
         $requisicao
             ->assertStatus(422)
@@ -78,7 +78,7 @@ describe('POST /api/bugs', function () {
             'status' => '',
             'descricao' => 'O sistema retorna erro 500 ao submeter',
         ]);
-        
+
         $response
             ->assertStatus(422)
             ->assertJsonValidationErrors(['status']);
@@ -88,13 +88,13 @@ describe('POST /api/bugs', function () {
 describe('PUT /api/bugs/{id}', function () {
     test('Deveria ser possível atualizar um bug', function () {
         $entrada = Bug::factory()->create();
-        
+
         $nova_entrada = [
             'titulo' => 'Erro ao salvar formulário - atualizado',
             'status' => 'resolvido',
             'descricao' => 'O sistema retorna erro 500 ao submeter - atualizado',
         ];
-        
+
         $response = $this->putJson("/api/bugs/{$entrada->id}", $nova_entrada);
         $response->assertStatus(200);
     });
@@ -103,9 +103,9 @@ describe('PUT /api/bugs/{id}', function () {
 describe('DELETE /api/bugs/{id}', function () {
     test('Deveria ser possível deletar um registro de bug', function () {
         $bug = Bug::factory()->create();
-        
+
         $response = $this->deleteJson("/api/bugs/{$bug->id}");
-        
+
         $response->assertStatus(204);
         $this->assertDatabaseMissing('bugs', ['id' => $bug->id]);
     });
@@ -124,7 +124,7 @@ describe('DELETE /api/bugs/{id}', function () {
 
     test('Deveria retornar uma mensagem caso o bug não seja encontrado para deleção', function () {
         $response = $this->deleteJson('/api/bugs/9999');
-        
+
         $response
             ->assertStatus(404)
             ->assertJsonFragment([

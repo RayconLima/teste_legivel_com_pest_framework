@@ -69,10 +69,11 @@ test-group: ## Executa grupo de testes (use: make test-group GROUP=bugs)
 # ==========================================
 # Testes - Cobertura (PCOV)
 # ==========================================
-coverage-pcov:
+
+coverage-pcov: ## Executa testes com relatório de cobertura PCOV
 	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app php -d pcov.enabled=1 artisan test --coverage
 
-coverage-html-pcov:
+coverage-html-pcov: ## Executa testes com relatório de cobertura HTML PCOV
 	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app php -d pcov.enabled=1 ./vendor/bin/pest --coverage --coverage-html=coverage-report
 	
 # ==========================================
