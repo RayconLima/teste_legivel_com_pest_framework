@@ -1,6 +1,16 @@
 # ==========================================
 # Configurações
 # ==========================================
+# 💡 TIP: Execute 'make help' para ver todos os comandos disponíveis
+# 📖 Para documentação completa, veja o README.md
+#
+# Comandos mais usados:
+#   make test              → Executa todos os testes
+#   make test-filter       → Executa testes específicos
+#   make test-coverage-html → Gera relatório de cobertura visual
+#   make lint              → Verifica estilo de código
+#   make ci                → Simula pipeline completa de CI/CD
+#
 .PHONY: help workspace test test-unit test-feature test-parallel test-coverage test-coverage-html test-coverage-xml test-filter test-group setup-test-db fresh-test xdebug-on xdebug-off xdebug-status pcov-on pcov-off
 
 .DEFAULT_GOAL := help
@@ -69,12 +79,31 @@ test-group: ## Executa grupo de testes (use: make test-group GROUP=bugs)
 # ==========================================
 # Testes - Cobertura (PCOV)
 # ==========================================
+test-coverage: pcov-on ## Executa testes com relatório de cobertura básico
+	@echo "$(BLUE)→ Executando testes com cobertura (PCOV)...$(NC)"
+	$(DOCKER_COMPOSE) exec -u $(PHP_USER) -e XDEBUG_MODE=off app php artisan test --coverage --min=80
+	@$(MAKE) pcov-off
 
-coverage-pcov: ## Executa testes com relatório de cobertura PCOV
-	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app php -d pcov.enabled=1 artisan test --coverage
+test-coverage-html: pcov-on ## Gera relatório HTML de cobertura
+	@echo "$(BLUE)→ Gerando relatório HTML de cobertura...$(NC)"
+	$(DOCKER_COMPOSE) exec -u $(PHP_USER) -e XDEBUG_MODE=off app ./vendor/bin/pest --coverage --coverage-html=coverage-report
+	@echo "$(GREEN)✓ Relatório gerado em: coverage-report/index.html$(NC)"
+	@$(MAKE) pcov-off
 
-coverage-html-pcov: ## Executa testes com relatório de cobertura HTML PCOV
-	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app php -d pcov.enabled=1 ./vendor/bin/pest --coverage --coverage-html=coverage-report
+test-coverage-xml: pcov-on ## Gera relatório XML de cobertura (Clover)
+	@echo "$(BLUE)→ Gerando relatório XML de cobertura...$(NC)"
+	$(DOCKER_COMPOSE) exec -u $(PHP_USER) -e XDEBUG_MODE=off app ./vendor/bin/pest --coverage --coverage-clover=coverage.xml
+	@echo "$(GREEN)✓ Relatório gerado: coverage.xml$(NC)"
+	@$(MAKE) pcov-off
+
+coverage-xml:
+	$(DOCKER_COMPOSE) exec -u $(PHP_USER) -e PCOV_ENABLED=1 -e XDEBUG_MODE=off app php -d pcov.enabled=1 ./vendor/bin/pest --coverage --coverage-clover=coverage.xml
+
+# executar-relatorio-de-cobertura: ## Executa testes com relatório de cobertura PCOV
+# 	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app php -d pcov.enabled=1 artisan test --coverage
+
+# executar-relatorio-de-cobertura-web: ## Executa testes com relatório de cobertura HTML PCOV
+# 	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app php -d pcov.enabled=1 ./vendor/bin/pest --coverage --coverage-html=coverage-report
 	
 # ==========================================
 # Database para Testes
@@ -177,3 +206,31 @@ lint: ## Executa linter (Pint)
 lint-fix: ## Corrige código com Pint
 	@echo "$(BLUE)→ Corrigindo código com Pint...$(NC)"
 	$(DOCKER_COMPOSE) exec -u $(PHP_USER) app ./vendor/bin/pint
+
+# ==========================================
+# SonarQube Integration
+# ==========================================
+sonar-up:
+	$(DOCKER_COMPOSE) up -d sonarqube postgres_sonar
+
+sonar-down:
+	$(DOCKER_COMPOSE) stop sonarqube postgres_sonar
+
+sonar-logs:
+	$(DOCKER_COMPOSE) logs -f sonarqube
+
+sonar-scan:
+	@echo "🧪 Gerando relatório de cobertura..."
+	@$(MAKE) coverage-xml
+	@echo "📊 Executando análise SonarQube..."
+	docker run --rm \
+		--network=teste_legivel_com_pest_framework_teste_legivel_com_pest \
+		-v "$(PWD):/usr/src" \
+		sonarsource/sonar-scanner-cli \
+		-Dsonar.host.url=http://sonarqube:9000 \
+		-Dsonar.login=$(SONAR_TOKEN)
+	@echo "✅ Análise concluída! Acesse: http://localhost:9000"
+
+sonar-reset:
+	$(DOCKER_COMPOSE) down sonarqube postgres_sonar -v
+	@echo "⚠️  Todos os dados do SonarQube foram apagados!"
